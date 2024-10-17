@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://TaskManagementApp-eb8vva.us-east-1.xata.sh/db/TaskManageme",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
