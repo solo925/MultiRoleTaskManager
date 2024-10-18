@@ -7,7 +7,7 @@ const LoginUser = () => {
     const [password,setPassword] = useState('');
   return (
     <div className="h-screen flex justify-center items-center">
-        <form className="m-auto border p-3 w-[450px] my-auto h-fit flex gap-y-8 flex-col items-start justify-start rounded-sm">
+        <form className="m-auto shadow-md p-3 w-[450px] my-auto h-fit flex gap-y-8 flex-col items-start justify-start rounded-md">
             <div className="text-center font-bold w-full text-white text-xl">Login User</div>
             <div className="flex flex-col gap-y-2 w-full">
                 <label htmlFor="email" className="text-white">Email</label>

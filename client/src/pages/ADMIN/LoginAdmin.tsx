@@ -1,4 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from "react";
+import Button from "../../components/Button";
+import { Link } from "react-router-dom";
 
 const LoginAdmin = () => {
   const [email, setEmail] = useState<string>("");
@@ -12,16 +14,17 @@ const LoginAdmin = () => {
   
 
   return (
+    <div className="flex justify-center items-center h-screen">
     <form 
       onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md"
+      className="max-w-md w-[450px] flex flex-col gap-y-6 mx-auto mt-8 p-6 rounded-sm shadow-md"
     >
-      <div className="text-2xl font-bold mb-6">Login Admin</div>
+      <div className="text-2xl text-center text-white font-bold mb-6">Login Admin</div>
       
       <div className="mb-4">
         <label 
           htmlFor="email" 
-          className="block text-gray-700 text-sm font-medium mb-2"
+          className="block text-white text-sm font-medium mb-2"
         >
           Email
         </label>
@@ -39,7 +42,7 @@ const LoginAdmin = () => {
       <div className="mb-6">
         <label 
           htmlFor="password" 
-          className="block text-gray-700 text-sm font-medium mb-2"
+          className="block text-white text-sm font-medium mb-2"
         >
           Password
         </label>
@@ -53,14 +56,13 @@ const LoginAdmin = () => {
           required
         />
       </div>
-
-      <button
-        type="submit"
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        Login
-      </button>
+      <div className="flex justify-between w-full">
+        <p className="text-white">New Here?</p>
+        <Link to="/admin/register" className="text-blue">Create an account</Link>
+      </div>
+      <Button text="Login"></Button>
     </form>
+    </div>
   );
 };
 
