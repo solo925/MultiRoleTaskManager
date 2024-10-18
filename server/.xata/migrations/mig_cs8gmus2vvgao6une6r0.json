@@ -1,0 +1,27 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_cs8gmus2vvgao6une6r0",
+    "operations": [
+      {
+        "add_column": {
+          "up": "now()",
+          "table": "task",
+          "column": {
+            "pk": false,
+            "name": "dueDate",
+            "type": "timestamptz",
+            "unique": false,
+            "comment": "",
+            "nullable": false
+          }
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_cs8gmus2vvgao6une6r0",
+  "parent": "mig_cs8gisn2qe4a1a2lbg7g",
+  "schema": "public",
+  "startedAt": "2024-10-17T13:05:00.529982Z"
+}
