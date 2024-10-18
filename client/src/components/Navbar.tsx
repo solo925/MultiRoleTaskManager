@@ -9,8 +9,9 @@ const Navbar = () => {
             <p className="font-bold text-white text-2xl text-calligraphy">TaskTracker</p>
         </div>
         <div className="flex justify-between">
-            <div className="links"></div>
-            <ImUser></ImUser>
+            <div className="outline shadow-2xl rounded-full p-3 flex justify-center items-center">
+             <ImUser className="text-white text-2xl"></ImUser>
+            </div>
         </div>
     </div>
   )

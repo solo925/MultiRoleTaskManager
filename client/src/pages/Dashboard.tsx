@@ -33,10 +33,10 @@ const Dashboard = () => {
                     <span>Logout</span>
                 </div>
             </div>
-            <div className="projects w-3/5 border-x p-2">
+            <div className="projects w-3/5 border-x p-2 h-[85vh]">
                 <h1 className="text-center text-xl text-white">Projects</h1>
             </div>
-            <div className="teams bg-slateGray bg-opacity-15 rounded-lg w-1/5 p-2">
+            <div className="teams bg-slateGray bg-opacity-15 rounded-lg w-1/5 p-2 h-[85vh]">
                 <h1 className="text-center text-xl text-white">Teams</h1>
             </div>
         </div>

@@ -97,6 +97,8 @@ const RegisterAdmin: React.FC<RegisterFormProps> = () => {
                 <p className="text-white">Already have an account?</p>
                 <Link to="/admin/login" className="text-blue">Login here</Link>
             </div>
+            
+
 
       <button
         type="submit"
