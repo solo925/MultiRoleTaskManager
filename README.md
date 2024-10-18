@@ -172,3 +172,10 @@ Stephen Mwangi
 Solomon Onyango
 Grace Mbugua
 Ocharo Michael
+
+## Task Management
+
+![alt text](my-profit-tutor-v30bSAWzp4I-unsplash.jpg)
+
+## Sample Tests
+<!-- To be populated -->
