@@ -1,9 +1,12 @@
 
 import express from 'express';
-import { register } from "../controllers/authController/authController";
+import { loginController as login, registerController as register } from '../controllers/authController/authController';
 
-const authRegisterRoute = express.Router();
+const loginRoute = express.Router();
+const registerRoute = express.Router();
 
-authRegisterRoute.use('/register', register)
+registerRoute.use('/register', register)
+loginRoute.use('/login', login)
 
-export { authRegisterRoute };
+export { loginRoute, registerRoute };
+

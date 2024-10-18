@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken"
 dotenv.config()
 
 
-const generateTokenUtil = (userId: number) => {
+const generateTokenUtil = (userId: string) => {
     const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'unavailable'
     const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || 'unavailable'
 
