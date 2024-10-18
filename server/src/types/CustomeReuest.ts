@@ -1,9 +1,10 @@
 
 interface CustomeRequest extends Request {
-    user: any,
-    header: any,
-    body: any,
-    db: any
+    user?: any;
+    header?: any;
+    body: any;
+
+
     // content: any,
 
 

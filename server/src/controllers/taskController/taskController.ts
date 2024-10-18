@@ -1,8 +1,10 @@
-import { Request, Response } from 'express';
-import { Task } from '../models/task';
-import { xata } from '../utils/db';
+import express, { Request, Response } from 'express';
+import { Task } from '../../models/task';
+// import { xata } from '../utils/db';
 
-export const createTask = async (req: Request, res: Response) => {
+export const createTask = express.Router();
+
+createTask.post("/", async (req: Request, res: Response) => {
     const { description, status, dueDate, projectId, assignedToId } = req.body;
 
     const newTask: Task = {
@@ -14,8 +16,8 @@ export const createTask = async (req: Request, res: Response) => {
         assignedToId
     };
 
-    await xata.db.tasks.create(newTask);
+    // await xata.db.tasks.create(newTask);
     res.status(201).json(newTask);
-};
+});
 
 // Add filtering by project or member, and other CRUD operations for tasks
