@@ -1,5 +1,5 @@
 import express from 'express';
-import { loginRoute, registerRoute } from './authRoute';
+import { loginRoute, logoutRoute, registerRoute } from './authRoute';
 import createProjectRoute from './projectRoute';
 import createTaskRoute from "./taskRoutes";
 
@@ -10,6 +10,7 @@ mainRoute.use('/auth/register', registerRoute);
 mainRoute.use('/auth/login', loginRoute);
 mainRoute.use('/createtasks', createTaskRoute);
 mainRoute.use('/projects', createProjectRoute);
+mainRoute.use('/logout', logoutRoute);
 
 
 
