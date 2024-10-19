@@ -3,9 +3,15 @@ type teamType = {
     name: string;
     description: string;
     adminId: string;
-    user?: any;
+    user?: {
+        userID?: string;
+    }
+}
 
+interface allteamTypes extends teamType, Request {
 
 }
 
-export default teamType
+
+export { allteamTypes, teamType };
+

@@ -3,5 +3,5 @@ import { createProject } from '../controllers/projectController/projectControlle
 
 const createProjectRoute = express.Router();
 
-createProjectRoute.use('createProject', createProject)
+createProjectRoute.use('/', createProject)
 export default createProjectRoute;

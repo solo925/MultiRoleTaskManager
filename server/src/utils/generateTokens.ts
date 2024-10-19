@@ -1,12 +1,12 @@
-import dotenv from "dotenv"
-import jwt from "jsonwebtoken"
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config()
 
 
 const generateTokenUtil = (userId: string) => {
-    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || 'unavailable'
-    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET || 'unavailable'
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+    const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
     if (!accessTokenSecret || !refreshTokenSecret) {
         throw new Error("Missing ACCESS_TOKEN_SECRET or  REFRESH_TOKEN_SECRET from the environments variables ")
@@ -25,4 +25,5 @@ const generateTokenUtil = (userId: string) => {
     }
 }
 
-export { generateTokenUtil }
+export { generateTokenUtil };
+

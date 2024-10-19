@@ -1,16 +1,42 @@
-import { Response } from 'express';
-import { Comment } from '../../models/comments';
-// import { xata } from '../utils/db';
-import express from 'express';
-import { commentType } from '../../types/commentypes';
+// import express, { Request, Response } from 'express';
+// import { Comment } from '../../models/comments';
+// import { CustomeRequest } from '../../types/CustomeReuest';
+// import { getXataClient } from '../../xata';
 
-const commentController = express.Router();
+// // Extend the Express Request type to include the custom 'users' field
+// // interface CustomRequest1 extends Request {
+// //     content: string;
+// //     taskId: string;
+// //     users:{
+// //     usherID:any;
+// //     }
+// // }
 
-commentController.post("/", async (req: Request<{}, {}, commentType>, res: Response): Promise<void> => {
-    const { content, taskId } = req.body;
-    const userId = req.user.userId;
+// const xata = getXataClient();
+// const commentController = express.Router();
 
-    const newComment: Comment = { id: Date.now().toString(), content, taskId, userId };
-    // await xata.db.comments.create(newComment);
-    res.status(201).json(newComment);
-});
+// commentController.post("/", async (req: Request<{}, {}, CustomeRequest>, res: Response): Promise<void> => {
+//     const { content, taskId } = req.body;
+
+//     // Access the userId from the custom request
+
+//     const userId = req.users.userId;
+
+
+//     // Ensure the structure of 'newComment' matches what Xata expects
+//     const newComment: Comment = {
+//         id: Date.now().toString(),
+//         content,
+//         taskId,
+//         userId
+//     };
+
+//     try {
+//         const createdComment = await xata.db.comment.create(newComment);
+//         res.status(201).json(createdComment);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error creating comment", error });
+//     }
+// });
+
+// export default commentController;

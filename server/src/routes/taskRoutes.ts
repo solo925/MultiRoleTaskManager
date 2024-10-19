@@ -1,8 +1,10 @@
 import { createTask } from '../controllers/taskController/taskController';
 
 import express from 'express';
-const createTaskRoute = express.Router();
+const Tasks = express.Router();
 
-createTaskRoute.post('/', createTask);
+Tasks.use('/', createTask);
+Tasks.use('/', createTask)
 
-export default createTaskRoute;
+
+export default Tasks;
