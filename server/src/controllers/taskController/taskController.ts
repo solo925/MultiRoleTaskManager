@@ -6,7 +6,7 @@ import { deleteTaskById, getTaskById, updateTaskById } from '../../utils/TaskUti
 export const createTask = express.Router();
 
 // Create Task
-createTask.post("/create", async (req: Request, res: Response): Promise<void> => {
+createTask.post("/", async (req: Request, res: Response): Promise<void> => {
     const { description, status, dueDate, projectId, assignedToId } = req.body;
 
     if (!description || !status || !dueDate || !projectId || !assignedToId) {
@@ -52,7 +52,7 @@ createTask.put("/:taskId", async (req: Request, res: Response): Promise<void> =>
         res.status(404).json({ error: "Task not found!" });
     }
 
-    res.status(200).json(updatedTask);
+    res.status(200).json({ message: "Task updated successfully!", data: updatedTask });
 });
 
 // Delete Task by ID
@@ -64,7 +64,7 @@ createTask.delete("/:taskId", async (req: Request, res: Response): Promise<void>
         res.status(404).json({ error: "Task not found!" });
     }
 
-    res.status(204).send(); // No content
+    res.status(204).json({ message: "Task deleted successfully!" }); // No content
 });
 
 // Get tasks by projectId

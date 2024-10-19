@@ -1,39 +1,24 @@
-// // middlewares/authMiddlewares/authMiddleware.ts
-// import { NextFunction, Response } from 'express';
-// import jwt from 'jsonwebtoken';
-// import { CustomeRequest } from '../../types/CustomeReuest'; // Ensure this path is correct
+import { NextFunction, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 
-// const JWT_SECRET = 'your_jwt_secret_key';
+interface tokenTypes extends Request {
+    status: number;
+    user: any;
+}
 
-// export const authenticateJWT = (req: CustomeRequest, res: Response, next: NextFunction) => {
-//     const token = req.header('Authorization')?.split(' ')[1];
+export const authenticateUser = (req: tokenTypes, res: Response, next: NextFunction) => {
+    const token = req.cookies['token-Cookie']; // Get token from cookies
 
-//     if (!token) {
-//         return res.status(403).json({ message: 'Access denied' });
-//     }
+    if (!token) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
 
-//     try {
-//         const decoded = jwt.verify(token, JWT_SECRET);
-//         (req as CustomeRequest).user = decoded;  // Use type assertion to access 'user'
-//         next();  // Proceed to the next middleware
-//     } catch (err) {
-//         res.status(401).json({ message: 'Invalid token' });
-//     }
-// };
-
-
-// export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
-//     const token = req.headers.authorization?.split(" ")[1];
-
-//     if (!token) {
-//         return res.status(401).json({ error: "Unauthorized" });
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
-//         req.users = { userId: decoded.userId };
-//         next();
-//     } catch (error) {
-//         res.status(401).json({ error: "Unauthorized" });
-//     }
-// };
+    try {
+        // Verify the token with the secret key from .env
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
+        req.user = decoded; // Attach the decoded token data (like userId) to the request object
+        next();
+    } catch (error) {
+        res.status(403).json({ message: "Invalid or expired token" });
+    }
+};

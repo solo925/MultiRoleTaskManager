@@ -6,7 +6,7 @@ import { deleteProjectById, getProjectById, updateProjectById } from '../../util
 export const createProject = express.Router();
 
 // Create Project
-createProject.post("/create", async (req: Request, res: Response): Promise<void> => {
+createProject.post("/", async (req: Request, res: Response): Promise<void> => {
     const { name, teamId } = req.body;
 
     if (!name || !teamId) {
