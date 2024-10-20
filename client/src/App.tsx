@@ -4,6 +4,11 @@ import RegisterAdmin from "./pages/ADMIN/RegisterAdmin"
 import RegisterUser from "./pages/user/RegisterUser"
 import LoginAdmin from "./pages/ADMIN/LoginAdmin"
 import LoginUser from "./pages/user/LoginUser"
+import TeamManagement from "./pages/TeamManagement"
+import ProjectManagement from "./pages/ProjectManagement"
+import TaskBoard from "./pages/TaskBoard"
+import TaskDetails from "./pages/TaskDetails"
+import Notifications from "./pages/Notifications"
 
 const App = () => {
   return (
@@ -15,6 +20,12 @@ const App = () => {
           <Route path="/user/register" element={<RegisterUser></RegisterUser>}></Route>
           <Route path="/admin/login" element={<LoginAdmin></LoginAdmin>}></Route>
           <Route path="/admin/register" element={<RegisterAdmin></RegisterAdmin>}></Route>
+
+          <Route path="/teams" element={<TeamManagement></TeamManagement>}></Route>
+          <Route path="/projects" element={<ProjectManagement></ProjectManagement>}></Route>
+          <Route path="/tasks" element={<TaskBoard></TaskBoard>}></Route>
+          <Route path="/tasks/view" element={<TaskDetails></TaskDetails>}></Route>
+          <Route path="/notifications" element={<Notifications></Notifications>}></Route>
         </Routes>
       </BrowserRouter>
 
