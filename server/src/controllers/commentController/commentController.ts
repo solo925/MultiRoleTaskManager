@@ -1,117 +1,111 @@
-// import express, { Request, Response } from 'express';
-// import { Comment } from '../../models/comments';
-// import { CustomeRequest } from '../../types/CustomeReuest';
-// import { getXataClient } from '../../xata';
+import { Request, Response, Router } from 'express';
+import authenticateToken from '../../middlewares/accessControl/accessControl'; // Import Token Middleware
+import { getXataClient } from '../../xata'; // Import Xata Client
 
-// // Extend the Express Request type to include the custom 'users' field
-// // interface CustomRequest1 extends Request {
-// //     content: string;
-// //     taskId: string;
-// //     users:{
-// //     usherID:any;
-// //     }
-// // }
+const commentController: Router = Router();
 
-// const xata = getXataClient();
-// const commentController = express.Router();
+// Xata Client
+const xata = getXataClient();
 
-// commentController.post("/", async (req: Request<{}, {}, CustomeRequest>, res: Response): Promise<void> => {
-//     const { content, taskId } = req.body;
+// Middleware to authorize a user for update/delete (either owner or admin)
+const authorizeComment = async (req: Request, res: Response, next: Function) => {
+    const commentId = req.params.id;
+    const { id: userId, role } = req.user; // Assuming user is set by the authenticateToken middleware
 
-//     // Access the userId from the custom request
+    try {
+        // Query to get the comment by its ID
+        const query = await xata.sql`
+            SELECT * FROM comments WHERE ID = ${parseInt(commentId)}
+        `;
 
-//     const userId = req.users.userId;
+        if (!query || query.length === 0) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
 
+        const comment = query[0];
 
-//     // Ensure the structure of 'newComment' matches what Xata expects
-//     const newComment: Comment = {
-//         id: Date.now().toString(),
-//         content,
-//         taskId,
-//         userId
-//     };
+        // Check if the user is the owner of the comment or an admin
+        if (comment.userId === userId || role === 'admin') {
+            return next(); // Proceed to update/delete
+        } else {
+            return res.status(403).json({ message: 'Not authorized to modify this comment' });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error });
+    }
+};
 
-//     try {
-//         const createdComment = await xata.db.comment.create(newComment);
-//         res.status(201).json(createdComment);
-//     } catch (error) {
-//         res.status(500).json({ message: "Error creating comment", error });
-//     }
-// });
+// 1. Create a new comment (only authenticated users can comment)
+commentController.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+    const { content, taskId } = req.body;
+    const { id: userId } = req.user; // Get user ID from authenticated token
 
-// export default commentController;
+    try {
+        // SQL query to insert a new comment using xata.sql
+        await xata.sql`
+            INSERT INTO comments (content, taskId, userId)
+            VALUES (${content}, ${taskId}, ${userId})
+        `;
 
-import express, { Request, Response } from 'express';
-
-const commentController = express.Router();
-
-// Dummy data
-const comments: Comment[] = [
-    { id: '1', content: 'This is a test comment', taskId: '101', userId: '1' },
-    { id: '2', content: 'Another comment for testing', taskId: '102', userId: '2' },
-];
-
-// Utility function to get a comment by ID
-function getCommentById(id: string): Comment | undefined {
-    return comments.find(comment => comment.id === id);
-}
-
-// Create a new comment
-commentController.post("/", (req: Request, res: Response) => {
-    const { content, taskId, userId } = req.body;
-
-    const newComment: Comment = {
-        id: Date.now().toString(),
-        content,
-        taskId,
-        userId
-    };
-
-    comments.push(newComment);
-    res.status(201).json(newComment);
-});
-
-// Get all comments
-commentController.get("/", (req: Request, res: Response) => {
-    res.json(comments);
-});
-
-// Get a single comment by ID
-commentController.get("/:id", (req: Request, res: Response) => {
-    const comment = getCommentById(req.params.id);
-
-    if (comment) {
-        res.json(comment);
-    } else {
-        res.status(404).json({ message: "Comment not found" });
+        res.status(201).json({ message: 'Comment created successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to create comment', error });
     }
 });
 
-// Update a comment by ID
-commentController.put("/:id", (req: Request, res: Response) => {
-    const comment = getCommentById(req.params.id);
+// 2. Get all comments (accessible to everyone)
+commentController.get('/', async (req: Request, res: Response): Promise<void> => {
+    try {
+        // SQL query to select all comments
+        const comments = await xata.sql`SELECT * FROM comments`;
 
-    if (comment) {
-        const { content, taskId } = req.body;
-        comment.content = content || comment.content;
-        comment.taskId = taskId || comment.taskId;
-        res.json(comment);
-    } else {
-        res.status(404).json({ message: "Comment not found" });
+        res.status(200).json({ comments });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to retrieve comments', error });
     }
 });
 
-// Delete a comment by ID
-commentController.delete("/:id", (req: Request, res: Response) => {
-    const commentIndex = comments.findIndex(comment => comment.id === req.params.id);
+// 3. Update comment (only owner or admin can update)
+commentController.put('/:id', authenticateToken, authorizeComment, async (req: Request, res: Response): Promise<void> => {
+    const { id: commentId } = req.params;
+    const { content } = req.body;
 
-    if (commentIndex !== -1) {
-        const deletedComment = comments.splice(commentIndex, 1);
-        res.json(deletedComment[0]);
-    } else {
-        res.status(404).json({ message: "Comment not found" });
+    try {
+        // SQL query to update the comment content by ID
+        const result = await xata.sql`
+            UPDATE comments SET content = ${content} WHERE ID = ${parseInt(commentId)}
+        `;
+
+        // Check if the update was successful
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Comment updated successfully' });
+        } else {
+            res.status(404).json({ message: 'Comment not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update comment', error });
+    }
+});
+
+// 4. Delete comment (only owner or admin can delete)
+commentController.delete('/:id', authenticateToken, authorizeComment, async (req: Request, res: Response): Promise<void> => {
+    const { id: commentId } = req.params;
+
+    try {
+        // SQL query to delete the comment by ID
+        const result = await xata.sql`
+            DELETE FROM comments WHERE ID = ${parseInt(commentId)}
+        `;
+
+        // Check if the delete was successful
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Comment deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Comment not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to delete comment', error });
     }
 });
 
 export default commentController;
-

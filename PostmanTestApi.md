@@ -1,13 +1,12 @@
-postman testing the api
+postman testing the api with Xata
 
-esting registration with postman
+testing registration with postman,successful
 ![alt text](image.png)
 
-user credentials dont match
-![alt text](image-1.png)
+user credentials dont match,login
+![alt text](image-2.png)
 successful login with tokens
-![alt text](image-5.png)
-
+![alt text](image-1.png)
 successful creation of task
 ![alt text](image-3.png)
 getting available tasks

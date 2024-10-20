@@ -1,10 +1,10 @@
 import { Router } from 'express';
-import { createTeam, joinTeam, leaveTeam } from '../controllers/teamController/teamControler';
+import { teamRouter } from '../controllers/teamController/teamControler';
 
-const router = Router();
+const Teamsroute = Router();
 
-router.post('/', createTeam);
-router.post('/join', joinTeam);
-router.post('/leave', leaveTeam);
+Teamsroute.use('/', teamRouter);
+// router.post('/join', joinTeam);
+// router.post('/leave', leaveTeam);
 
-export default router;
+export default Teamsroute;

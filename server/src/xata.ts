@@ -456,7 +456,7 @@ const DatabaseClient = buildClient();
 const defaultOptions = {
   databaseURL:
     "https://TaskManagementApp-eb8vva.us-east-1.xata.sh/db/TaskManageme",
-  apikey: process.env.XATA_API_KEY,
+  apiKey: process.env.XATA_API_KEY,
 };
 
 export class XataClient extends DatabaseClient<DatabaseSchema> {
@@ -468,8 +468,11 @@ export class XataClient extends DatabaseClient<DatabaseSchema> {
 let instance: XataClient | undefined = undefined;
 
 export const getXataClient = () => {
-  if (instance) return instance;
-
-  instance = new XataClient();
+  if (!instance) {
+    instance = new XataClient({
+      apiKey: process.env.XATA_API_KEY,
+      branch: process.env.XATA_BRANCH,
+    });
+  }
   return instance;
 };

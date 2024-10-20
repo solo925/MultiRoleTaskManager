@@ -1,7 +1,9 @@
 export interface User {
-    id: string;
+    ID: number;
     name: string;
     email: string;
     password: string;
-    role: string[];
+    role: 'Admin' | 'TeamMember';
 }
+
+export default User

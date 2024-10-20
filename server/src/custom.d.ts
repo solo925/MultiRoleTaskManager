@@ -1,12 +1,11 @@
-// // custom.d.ts
+// custom.d.ts or types.d.ts (make sure to import express)
 
-// interface UserData {
-//     userId: string;
-//     // Add other fields if necessary, like role, email, etc.
-// }
 
-// declare module 'express-serve-static-core' {
-//     interface Request {
-//         users?: UserData; // Add the users field to the Request object
-//     }
-// }
+declare global {
+    namespace Express {
+        interface Request {
+            user?: any; // Add any properties you need, such as 'id', 'role', etc.
+        }
+    }
+}
+
