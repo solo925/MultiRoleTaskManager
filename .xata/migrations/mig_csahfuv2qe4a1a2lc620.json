@@ -1,0 +1,20 @@
+{
+  "done": true,
+  "migration": {
+    "name": "mig_csahfuv2qe4a1a2lc620",
+    "operations": [
+      {
+        "drop_column": {
+          "down": "0",
+          "table": "comment",
+          "column": "ID"
+        }
+      }
+    ]
+  },
+  "migrationType": "pgroll",
+  "name": "mig_csahfuv2qe4a1a2lc620",
+  "parent": "mig_cs9ajb4jvfnl258s5v8g",
+  "schema": "public",
+  "startedAt": "2024-10-20T14:47:24.369619Z"
+}
