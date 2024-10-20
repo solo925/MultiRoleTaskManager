@@ -3,7 +3,7 @@ type usersType = {
     name: string;
     email: string;
     password: string;
-    role: "Admin" | "TeamMember";
+    role: string; //maybe change late
 }
 
 export { usersType };

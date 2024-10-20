@@ -7,9 +7,9 @@ const loginRoute = express.Router();
 const registerRoute = express.Router();
 const logoutRoute = express.Router();
 
-registerRoute.use('/register', register)
-loginRoute.use('/login', login)
-logoutRoute.use('/logout', logOutController)
+registerRoute.use('/', register)
+loginRoute.use('/', login)
+logoutRoute.use('/', logOutController)
 
 export { loginRoute, logoutRoute, registerRoute };
 
