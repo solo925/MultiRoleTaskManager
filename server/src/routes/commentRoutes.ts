@@ -1,7 +1,8 @@
 import { Router } from 'express';
+import commentController from '../controllers/commentController/commentController';
 
-const router = Router();
+const commentRoute = Router();
 
-// router.post('/', addComment);
+commentRoute.use("/", commentController);
 
-export default router;
+export default commentRoute;
