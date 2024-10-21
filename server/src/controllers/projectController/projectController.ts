@@ -1,55 +1,75 @@
 import express, { Request, Response } from 'express';
-import authenticateToken from '../../middlewares/accessControl/accessControl'; // Ensure that this is your correct Xata client import
 import { getXataClient } from '../../xata';
 
 export const createProject = express.Router();
+
 const xata = getXataClient();
 
 
 
-// Create Project
-createProject.post("/", async (req: Request, res: Response): Promise<void> => {
+createProject.post("/", async (req: Request, res: Response): Promise<any> => {
     const { name } = req.body;
 
+    // Validate that the name is provided
     if (!name) {
-        res.status(400).json({ error: "Name is required!" });
+        return res.status(400).json({ error: "Name is required!" });
     }
+
+    // Auto-generate the teamId
+    const teamId = "id-00285243";  // Unique teamId generated on each request
+
+    // Optionally, use authenticated user's id (if logged in) or a default userId
+    // const userId = req.user?.xata_id || 'default-user-id';  // Use token userId if available, otherwise fall back
 
     try {
         // Check if a project with the same name already exists
-        // const result: any = await xata.sql`
-        //     SELECT * FROM "project" WHERE "NAME" = ${name};`;
+        const existingProjectResult: any = await xata.sql`
+            SELECT * FROM "project" WHERE "NAME" = ${name};`;
 
-        // if (result.rows && result.rows.length > 0) {
-        //     res.status(409).json({ error: "A project with this name already exists." });
-        // }
+        if (existingProjectResult.records && existingProjectResult.records.length > 0) {
+            return res.status(409).json({ error: "A project with this name already exists." });
+        }
 
-        // Insert new project into the Xata database
+        // Insert new project into the Xata database with the generated teamId and userId
         const insertResult: any = await xata.sql`
-            INSERT INTO "project" ("NAME")
-            VALUES (${name})`;
+            INSERT INTO "project" ("NAME", "teamId")
+            VALUES (${name}, ${teamId})
+            RETURNING *;
+        `;
 
-        res.status(201).json({
-            message: "Project created successfully!",
-            data: insertResult.rows[0]  // Returning the created project
-        });
+        // Retrieve the newly inserted project
+        const newProject: any = await xata.sql`
+            SELECT * FROM "project" WHERE "NAME" = ${name} AND "teamId" = ${teamId} ORDER BY "xata_createdat" DESC LIMIT 1;
+        `;
+
+        // If the project was successfully created, return the result
+        if (newProject.records && newProject.records.length > 0) {
+            return res.status(201).json({
+                message: "Project created successfully!",
+                data: newProject.records[0],  // Return the inserted project
+            });
+        } else {
+            return res.status(500).json({ error: "Failed to retrieve created project." });
+        }
     } catch (error: any) {
         console.error("Error creating project:", error);
         res.status(500).json({ error: error.message });
     }
 });
 
-
-
 // Get All Projects
 createProject.get("/", async (req: Request, res: Response): Promise<void> => {
     try {
         // Fetch all projects from Xata
-        const projects: any = await xata.sql`SELECT * FROM "project"; `;
+        const projects: any = await xata.sql`SELECT * FROM "project";`;
 
+        // Log the project data to help debug
+        console.log("Projects retrieved:", projects);
+
+        // Return the projects using the correct field (records)
         res.status(200).json({
             message: "Projects retrieved successfully!",
-            data: projects.rows
+            data: projects.records  // Use records, not rows
         });
     } catch (error: any) {
         console.error("Error retrieving projects:", error);
@@ -64,16 +84,19 @@ createProject.get("/:projectId", async (req: Request, res: Response): Promise<vo
     try {
         // Fetch single project by ID from Xata
         const project: any = await xata.sql`
-        SELECT * FROM "project"
-            WHERE "ID" = ${projectId}; `;
+            SELECT * FROM "project"
+            WHERE "xata_id" = ${projectId};`;
 
-        if (project.rows.length === 0) {
+        // Check if any project was returned
+        if (project.records.length === 0) {
             res.status(404).json({ error: "Project not found!" });
+            return;
         }
 
+        // Return the first record if found
         res.status(200).json({
             message: "Project retrieved successfully!",
-            data: project.rows[0]
+            data: project.records[0]
         });
     } catch (error: any) {
         console.error("Error retrieving project:", error);
@@ -81,32 +104,51 @@ createProject.get("/:projectId", async (req: Request, res: Response): Promise<vo
     }
 });
 
+
 // Update Project by ID
-createProject.put("/:projectId", authenticateToken, async (req: Request, res: Response): Promise<void> => {
+createProject.put("/:projectId", async (req: Request, res: Response): Promise<any> => {
     const { projectId } = req.params;
-    const { name, teamId } = req.body;
+    const { NAME, teamId } = req.body;
 
     try {
+        // Check if the project exists
+        const existingProject = await xata.sql`
+            SELECT * FROM "project" WHERE "xata_id" = ${projectId};`;
+
+        if (existingProject.records.length === 0) {
+            return res.status(404).json({ error: "Project not found!" });
+        }
+
+        // Check if the team exists
+        const existingTeam = await xata.sql`
+            SELECT * FROM "team" WHERE "xata_id" = ${teamId};`;
+
+        if (existingTeam.records.length === 0) {
+            return res.status(404).json({ error: "Team not found!" });
+        }
+
         // Update project by ID in Xata
         const updatedProject: any = await xata.sql`
             UPDATE "project"
-            SET "NAME" = ${name}, "teamId" = ${teamId}
-            WHERE "ID" = ${projectId}
-        RETURNING *; `;
+            SET "NAME" = ${NAME}, "teamId" = ${teamId}
+            WHERE "xata_id" = ${projectId}
+            RETURNING *;`;
 
-        if (updatedProject.rows.length === 0) {
-            res.status(404).json({ error: "Project not found!" });
+        if (updatedProject.records.length === 0) {
+            return res.status(404).json({ error: "Failed to update project." });
         }
 
+        // Send response back
         res.status(200).json({
             message: "Project updated successfully!",
-            data: updatedProject.rows[0]
+            data: updatedProject.records[0] // Use `.records` here
         });
     } catch (error: any) {
         console.error("Error updating project:", error);
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Delete Project by ID
 createProject.delete("/:projectId", async (req: Request, res: Response): Promise<void> => {
@@ -116,10 +158,10 @@ createProject.delete("/:projectId", async (req: Request, res: Response): Promise
         // Delete project by ID from Xata
         const deletedProject: any = await xata.sql`
             DELETE FROM "project"
-            WHERE "ID" = ${projectId}
+            WHERE "xata_id" = ${projectId}
         RETURNING *; `;
 
-        if (deletedProject.rows.length === 0) {
+        if (deletedProject.records.length === 0) {
             res.status(404).json({ error: "Project not found!" });
         }
 
@@ -134,7 +176,7 @@ createProject.delete("/:projectId", async (req: Request, res: Response): Promise
 
 // Get Projects by Team ID
 createProject.get("/team/:teamId", async (req: Request, res: Response): Promise<void> => {
-    const { teamId } = req.params;
+    const { name, teamId } = req.params;
 
     try {
         // Fetch projects by teamId from Xata

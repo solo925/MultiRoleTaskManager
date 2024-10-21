@@ -9,10 +9,23 @@ dotenv.config();
 export const RegisterController: Router = express.Router();
 export const loginController: Router = express.Router();
 
-// Register Route
+
+
+// Xata Client
+const xata = getXataClient();
+
 RegisterController.post('/', async (req: Request, res: Response): Promise<void> => {
-    const { name, email, password } = req.body;
-    const xata = getXataClient(); // Initialize Xata client
+    const { name, email, password, confirmPassword, role = 'TeamMember' } = req.body;
+
+    // Check if all required fields are present
+    if (!name || !email || !password || !confirmPassword) {
+        res.status(400).json({ message: 'All fields are required!' });
+    }
+
+    // Validate password and confirmPassword match
+    if (password !== confirmPassword) {
+        res.status(400).json({ message: 'Passwords do not match!' });
+    }
 
     try {
         // Check if the user already exists by email
@@ -20,42 +33,48 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
         }
-
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-        const latestUser = await xata.db.users
-            .sort('ID', 'desc')
-            .getFirst(); // Get the user with the highest ID
 
-        let newId: number;
+        // Insert new user into the Xata database
+        const result: any = await xata.sql`
+            INSERT INTO "users" (email, name, password, role)
+            VALUES (
+                ${email},
+                ${name},
+                ${hashedPassword},
+                ARRAY[${role}] -- Passing role as an array
+            )
+            RETURNING *;
+        `;
 
-        if (latestUser && latestUser.ID) {
-            // Increment the last ID
-            newId = latestUser.ID + 1;
+        // Debugging: log the result to see if the insert worked
+        console.log("Result of insert query: ", result);
+
+        // Check if 'records' exists and is not empty
+        if (result && result.records && result.records.length > 0) {
+            const newUser = result.records[0]; // Get the first record from the returned data
+
+            // Generate a JWT token using the xata_id
+            const token = jwt.sign({ id: newUser.xata_id }, process.env.JWT_SECRET!, {
+                expiresIn: '1h',
+            });
+
+            // Respond with the token and user information
+            res.status(201).json({ token, message: 'User registered successfully', user: newUser });
         } else {
-            // If no users exist yet, start with ID 1
-            newId = 1;
+            // If no records were returned, log and return error
+            console.log("User creation failed: No result returned");
+            res.status(500).json({ message: 'User creation failed', error: 'No result returned from SQL query' });
         }
-
-        // Now create the new user with the incremented ID
-        const newUser = await xata.db.users.create({
-            ID: newId, // Use the new incremented ID
-            name,
-            email,
-            password: hashedPassword,
-            role: ['TeamMember'], // Default role
-        });
-
-        // Generate a JWT token
-        const token = jwt.sign({ id: newUser.xata_id }, process.env.JWT_SECRET!, {
-            expiresIn: '1h',
-        });
-
-        res.status(201).json({ token, message: 'User registered successfully', user: newUser });
-    } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+    } catch (error: any) {
+        // Catch SQL or any unexpected errors
+        console.error("Error during user creation: ", error);
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
 });
+
+
 
 // Login Route
 loginController.post('/', async (req: Request, res: Response): Promise<any> => {
