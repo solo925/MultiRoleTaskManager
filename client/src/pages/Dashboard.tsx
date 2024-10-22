@@ -8,6 +8,9 @@ import { AiOutlineTeam } from "react-icons/ai";
 import { FaCubesStacked } from "react-icons/fa6";
 import { MdNotificationsActive } from "react-icons/md";
 import { FaComments } from "react-icons/fa";
+import { GrProjects } from "react-icons/gr";
+import { FaUsers } from "react-icons/fa6";
+import { VscChecklist } from "react-icons/vsc";
 import toast, {Toaster} from "react-hot-toast";
 
 interface Project{
@@ -113,25 +116,29 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className="w-4/6 flex flex-wrap justify-evenly gap-6">
-                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
-                    <div>{tasks.length}</div>
+                <div className="flex flex-col justify-center items-center gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <VscChecklist className="text-2xl"></VscChecklist>
+                    <div className="text-4xl">{tasks.length}</div>
                     <div>Tasks</div>
                 </div>
-                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
-                    <div>{projects.length}</div>
+                <div className="flex flex-col justify-center items-center gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <GrProjects className="text-2xl"></GrProjects>
+                    <div className="text-4xl">{projects.length}</div>
                     <div>Projects</div>
                 </div>
-                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
-                    <div>{users.length}</div>
+                <div className="flex flex-col justify-center items-center gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <FaUsers className="text-2xl"></FaUsers>
+                    <div className="text-4xl">{users.length}</div>
                     <div>Users</div>
                 </div>
-                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
-                    <div>56</div>
+                <div className="flex flex-col justify-center items-center gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <MdNotificationsActive className="text-2xl"></MdNotificationsActive>
+                    <div className="text-4xl">56</div>
                     <div>Notifications</div>
                 </div>
-                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                <div className="flex flex-col justify-center items-center gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
                     <FaComments className="text-2xl"></FaComments>
-                    <div>56</div>
+                    <div className="text-4xl">56</div>
                     <div>Comments</div>
                 </div>
             </div>

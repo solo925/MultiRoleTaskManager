@@ -150,6 +150,9 @@ const TeamManagement = () => {
             />
           </div>         
           <button className="bg-blue text-white w-fit p-2 mx-auto">Create Team</button>
+          <button className="bg-blue text-white w-fit p-2 mx-auto">Invite User</button>
+          <button className="bg-blue text-white w-fit p-2 mx-auto">Delete Project</button>
+          <button className="bg-blue text-white w-fit p-2 mx-auto">Update Project</button>
         </form>
       )}
     </div>
