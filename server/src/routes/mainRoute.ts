@@ -7,6 +7,7 @@ import Teamsroute from './teamRoutes';
 import usersRoute from './usersRoute';
 
 
+
 const mainRoute = express.Router();
 
 mainRoute.use('/auth/register', registerRoute);

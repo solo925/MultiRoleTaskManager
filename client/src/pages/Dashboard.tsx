@@ -3,13 +3,12 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar"
 import { IoMdLogOut } from "react-icons/io";
 import { HiHome } from "react-icons/hi";
-import { RiPlayListAddFill } from "react-icons/ri";
 import { MdOutlineManageHistory } from "react-icons/md";
 import { AiOutlineTeam } from "react-icons/ai";
 import { FaCubesStacked } from "react-icons/fa6";
 import { MdNotificationsActive } from "react-icons/md";
-import { IoIosSearch } from "react-icons/io";
 import { FaComments } from "react-icons/fa";
+import toast, {Toaster} from "react-hot-toast";
 
 interface Project{
   xata_id:string,
@@ -18,16 +17,31 @@ interface Project{
   teamId: string;
 }
 
+interface User{
+    email: string,
+    name:string,
+    role:string[],
+    xata_id:string
+}
 
 const Dashboard = () => {
     const [logoutModal,setLogoutModal] = useState<boolean>(false);
     const [projects,setProjects] = useState<Project[]>([]);
+    const [users,setUsers] = useState<User[]>([]);
+    const [tasks,setTasks] = useState<User[]>([]);
 
     useEffect(()=>{
         const fetchUsers = async () => {
-            const response = await fetch ("")
+            const response = await fetch ("http://localhost:3000/api/v1/users");
+            if (!response.ok) {
+                toast.error("Error fetching projects");                
+            }else{
+                const data = await response.json();
+                setUsers(data.users)
+            }
             
         }
+        fetchUsers();
 
     },[])
 
@@ -46,8 +60,25 @@ const Dashboard = () => {
         fetchProjects();
 
     },[])
+
+    useEffect(()=>{
+        const fetchTasks = async () => {
+            const response = await fetch ("http://localhost:3000/api/v1/tasks");
+            if (!response.ok) {
+                toast.error("Error fetching projects");                
+            }else{
+                const data = await response.json();
+                setTasks(data)
+            }
+            
+        }
+
+        fetchTasks();
+
+    },[])
   return (
     <div className="flex flex-col px-4 pl-0 relative">
+        <Toaster position="top-left"></Toaster>
         <Navbar></Navbar>
         <div className="flex gap-x-10">
             <div className="sidebar text-white flex flex-col space-y-3 w-1/6">
@@ -81,16 +112,42 @@ const Dashboard = () => {
                     <span>Logout</span>
                 </div>
             </div>
-            <div>
-                <div>Tasks</div>
-                <div>Projects</div>
-                <div>Tasks</div>
-                <div>Tasks</div>
-                <div>Tasks</div>
+            <div className="w-4/6 flex flex-wrap justify-evenly gap-6">
+                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <div>{tasks.length}</div>
+                    <div>Tasks</div>
+                </div>
+                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <div>{projects.length}</div>
+                    <div>Projects</div>
+                </div>
+                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <div>{users.length}</div>
+                    <div>Users</div>
+                </div>
+                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <div>56</div>
+                    <div>Notifications</div>
+                </div>
+                <div className="flex flex-col gap-y-10 w-80 rounded-md shadow-md bg-white text-black p-3">
+                    <FaComments className="text-2xl"></FaComments>
+                    <div>56</div>
+                    <div>Comments</div>
+                </div>
             </div>
             
             <div className="teams bg-slateGray bg-opacity-15 rounded-lg w-1/6 p-2 h-[85vh]">
                 <h1 className="text-center text-xl text-white">Users</h1>
+                <div className="flex flex-col gap-y-5">
+                    {
+                        users.map(eachUser => <div key={eachUser.xata_id} className="w-full text-white">
+                            <div>{eachUser.name}</div>
+                            <div>{eachUser.email}</div>
+                            <div>{eachUser.role}</div>
+                            <div>{eachUser.xata_id}</div>
+                        </div>)
+                    }
+                </div>
             </div>
         </div>
 
