@@ -1,3 +1,4 @@
+import React from 'react';
 const TaskBoard = () => {
   return (
     <div className="grid grid-cols-5 gap-x-5 justify-between items-start p-8 text-white">

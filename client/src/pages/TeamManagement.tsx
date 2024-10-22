@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import CreateTeam from "../components/CreateTeam";
 import Button from "../components/Button";
 import { useState, ChangeEvent, FormEvent } from "react";
