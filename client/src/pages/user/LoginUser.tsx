@@ -37,7 +37,7 @@ const LoginUser = () => {
       toast.success("Login successful");
       
       // Optionally store the token in localStorage
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("task_Token", data.token);
 
       // Redirect to user dashboard or home page
       toast.success("User login successful")

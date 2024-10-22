@@ -63,8 +63,8 @@ const Home = () => {
         <div className="lg:w-1/2 flex flex-col gap-6 max-w-md">
           {/* Admin Registration */}
           <Link 
-            to="/admin/register" 
-            className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+            to="/admin/login" 
+            className="bg-blue text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             <div className="mb-4">
               <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -80,7 +80,7 @@ const Home = () => {
           {/* Team Member Registration */}
           <Link 
             to="/user/register" 
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="bg-success text-white rounded-lg p-6 text-center transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             <div className="mb-4">
               <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,7 +97,7 @@ const Home = () => {
 
       {/* Footer - Login Link */}
       <div className="p-4 text-center text-gray-400">
-        <p>Already have an account? <Link to="/login" className="text-blue-400 hover:text-blue-300">Login here</Link></p>
+        <p>TaskTracker All Rights Reserved. &copy; 2024</p>
       </div>
     </div>
   )

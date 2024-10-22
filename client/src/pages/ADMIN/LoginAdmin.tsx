@@ -1,6 +1,6 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import toast, {Toaster} from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const LoginAdmin = () => {
   const [email, setEmail] = useState<string>("");
@@ -11,7 +11,7 @@ const LoginAdmin = () => {
     e.preventDefault();
 
     if(!email || !password){
-      toast.error("All fildes are ")
+      toast.error("All fields are required")
     }
     const response = await fetch("http://localhost:3000/api/v1/auth/login",{
       method:"POST",
@@ -75,10 +75,6 @@ const LoginAdmin = () => {
           className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-      </div>
-      <div className="flex justify-between w-full">
-        <p className="text-white">New Here?</p>
-        <Link to="/admin/register" className="text-blue">Create an account</Link>
       </div>
       <button onClick={handleSubmit} className="bg-blue text-white px-6 p-2">Log in Admin</button>
     </form>

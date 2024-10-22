@@ -75,6 +75,11 @@ const TeamManagement = () => {
     fetchTeams();
   }, []);
 
+
+  const joinTeam = async()=>{
+
+  }
+
   return (
     <div className="flex bg-slateGray flex-col justify-center items-center gap-y-5 p-8 relative">
       <Toaster position="top-left"></Toaster>
@@ -94,6 +99,10 @@ const TeamManagement = () => {
             </div>
             <div className="text-black font-light text-base">
               Team created at: <br /> {eachTeam.xata_createdat}
+            </div>
+
+            <div className="flex gap-x-2">
+              <button onClick={joinTeam} className="px-4 p-2 bg-card shadow-md rounded-md text-blue cursor-pointer">Join Team</button>
             </div>
           </div>
         ))}

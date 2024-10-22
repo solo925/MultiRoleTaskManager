@@ -11,6 +11,7 @@ import TaskDetails from "./pages/TaskDetails"
 import Notifications from "./pages/Notifications"
 import Home from "./pages/Home"
 import Comments from "./pages/Comments"
+import DashboardUser from "./pages/DasboardUser"
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home></Home>}></Route>
           <Route path="/dashboard" element={<Dashboard></Dashboard>}></Route>
+          <Route path="/user" element={<DashboardUser></DashboardUser>}></Route>
           <Route path="/user/login" element={<LoginUser></LoginUser>}></Route>
           <Route path="/user/register" element={<RegisterUser></RegisterUser>}></Route>
           <Route path="/admin/login" element={<LoginAdmin></LoginAdmin>}></Route>
