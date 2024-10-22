@@ -103,8 +103,7 @@
     "allowJs": true,
     "types": ["jest","node", "@testing-library/jest-dom"] ,
     },
-    "include": ["../client/src/pages/ADMIN/LoginAdmin.tsx",
-                     "../tests/LoginAdmin.test.tsx"] ,
+    "include": [ "../client/src/pages/ADMIN/*.tsx", "../tests/*.test.tsx","../tests/*.test.ts", "../client/src/components/**/*.tsx", "../client/src/hooks/*.ts" ,"../server/src/*.ts"] ,
     
 
     "exclude": ["node_modules"]

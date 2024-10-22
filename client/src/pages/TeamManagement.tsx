@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import CreateTeam from "../components/CreateTeam";
 import toast, { Toaster } from "react-hot-toast";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
