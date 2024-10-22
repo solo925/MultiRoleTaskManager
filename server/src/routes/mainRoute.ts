@@ -4,6 +4,7 @@ import commentRoute from './commentRoutes';
 import createProjectRoute from './projectRoute';
 import Tasks from './taskRoutes';
 import Teamsroute from './teamRoutes';
+import usersRoute from './usersRoute';
 
 
 const mainRoute = express.Router();
@@ -15,6 +16,7 @@ mainRoute.use('/projects', createProjectRoute);
 mainRoute.use('/teams', Teamsroute);
 mainRoute.use('/comments', commentRoute);
 mainRoute.use('/logout', logoutRoute);
+mainRoute.use('/users', usersRoute);
 
 
 
