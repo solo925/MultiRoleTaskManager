@@ -2,7 +2,8 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import express, { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
-import { getXataClient } from '../../xata'; // Import Xata Client
+import userValidationSchema from '../../schemas/validationschema';
+import { getXataClient } from '../../xata';
 
 dotenv.config();
 
@@ -14,18 +15,17 @@ export const loginController: Router = express.Router();
 // Xata Client
 const xata = getXataClient();
 
+
+// Register Controller with Validation
 RegisterController.post('/', async (req: Request, res: Response): Promise<void> => {
-    const { name, email, password, confirmPassword, role = 'TeamMember' } = req.body;
+    const { name, email, password, confirmPassword, role } = req.body;
 
-    // Check if all required fields are present
-    if (!name || !email || !password || !confirmPassword) {
-        res.status(400).json({ message: 'All fields are required!' });
-        return;
-    }
+    // Validate the input using Joi schema
+    const { error } = userValidationSchema.validate({ name, email, password, confirmPassword, role });
 
-    // Validate password and confirmPassword match
-    if (password !== confirmPassword) {
-        res.status(400).json({ message: 'Passwords do not match!' });
+    // If there's a validation error, send a 400 response with the error message
+    if (error) {
+        res.status(400).json({ message: error.details[0].message });
         return;
     }
 
@@ -36,6 +36,7 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
             res.status(400).json({ message: 'User already exists' });
             return;
         }
+
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -59,7 +60,7 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
             const newUser = result.records[0]; // Get the first record from the returned data
 
             // Generate a JWT token using the xata_id
-            const token = jwt.sign({ id: newUser.xata_id }, process.env.JWT_SECRET!, {
+            const token = jwt.sign({ id: newUser.xata_id, role: newUser.role }, process.env.JWT_SECRET!, {
                 expiresIn: '1h',
             });
 

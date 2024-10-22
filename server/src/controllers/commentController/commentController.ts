@@ -1,4 +1,5 @@
 import { Request, Response, Router } from 'express';
+import authenticateToken from '../../middlewares/accessControl/accessControl';
 import { getXataClient } from '../../xata'; // Import Xata Client
 
 export const commentController: Router = Router();
@@ -15,7 +16,7 @@ interface cus extends Request {
 }
 
 // 1. Create a new comment (only authenticated users can comment)
-commentController.post('/', async (req: cus, res: Response): Promise<void> => {
+commentController.post('/', authenticateToken, async (req: cus, res: Response): Promise<void> => {
     const { comment } = req.body;
     const userId = "rec_csavjvtqrj64enfmlpmg"// Only comment is required, taskId and userId will be inferred
     // const { id: userId } = req.user; // Get user ID from authenticated token
@@ -47,7 +48,7 @@ commentController.get('/', async (req: Request, res: Response): Promise<void> =>
 });
 
 // 3. Update comment (only owner or admin can update)
-commentController.put('/:id', async (req: Request, res: Response): Promise<void> => {
+commentController.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { id: commentId } = req.params;
     const { comment } = req.body; // Only comment needs to be provided
 
@@ -73,7 +74,7 @@ commentController.put('/:id', async (req: Request, res: Response): Promise<void>
 });
 
 // 4. Delete comment (only owner or admin can delete)
-commentController.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+commentController.delete('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { id: commentId } = req.params;
 
     try {

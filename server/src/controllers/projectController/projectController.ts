@@ -1,13 +1,14 @@
 import express, { Request, Response } from 'express';
+import authenticateToken, { CustomRequest1 } from '../../middlewares/accessControl/accessControl';
+import { adminOnly } from '../../middlewares/accessControl/protectedRouteAdmin';
 import { getXataClient } from '../../xata';
-
 export const createProject = express.Router();
 
 const xata = getXataClient();
 
+// Ensure correct import for CustomRequest1
 
-
-createProject.post("/", async (req: Request, res: Response): Promise<any> => {
+createProject.post("/", adminOnly, authenticateToken, async (req: CustomRequest1, res: Response): Promise<any> => {
     const { name } = req.body;
 
     // Validate that the name is provided
@@ -18,8 +19,9 @@ createProject.post("/", async (req: Request, res: Response): Promise<any> => {
     // Auto-generate the teamId
     const teamId = "id-00285243";  // Unique teamId generated on each request
 
-    // Optionally, use authenticated user's id (if logged in) or a default userId
-    // const userId = req.user?.xata_id || 'default-user-id';  // Use token userId if available, otherwise fall back
+    // Use the authenticated user's xata_id (if logged in) or fall back to a default adminId
+    const userId = req.user?.xata_id;
+    // Use the token's xata_id if available
 
     try {
         // Check if a project with the same name already exists
@@ -57,11 +59,12 @@ createProject.post("/", async (req: Request, res: Response): Promise<any> => {
     }
 });
 
+
 // Get All Projects
 createProject.get("/", async (req: Request, res: Response): Promise<void> => {
     try {
         // Fetch all projects from Xata
-        const projects: any = await xata.sql`SELECT * FROM "project";`;
+        const projects: any = await xata.sql`SELECT * FROM "project";`; // Remove RETURNING
 
         // Log the project data to help debug
         console.log("Projects retrieved:", projects);
@@ -106,7 +109,7 @@ createProject.get("/:projectId", async (req: Request, res: Response): Promise<vo
 
 
 // Update Project by ID
-createProject.put("/:projectId", async (req: Request, res: Response): Promise<any> => {
+createProject.put("/:projectId", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<any> => {
     const { projectId } = req.params;
     const { NAME, teamId } = req.body;
 
@@ -151,7 +154,7 @@ createProject.put("/:projectId", async (req: Request, res: Response): Promise<an
 
 
 // Delete Project by ID
-createProject.delete("/:projectId", async (req: Request, res: Response): Promise<void> => {
+createProject.delete("/:projectId", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { projectId } = req.params;
 
     try {

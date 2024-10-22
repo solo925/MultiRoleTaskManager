@@ -131,7 +131,7 @@ const TaskBoard = () => {
       headers:{
         "Content-Type":"application/json"
       },
-      body:JSON.stringify({comments})
+      body:JSON.stringify({comment})
     })
 
   }
