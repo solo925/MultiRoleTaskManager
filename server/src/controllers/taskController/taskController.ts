@@ -1,12 +1,19 @@
+import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
+import authenticateToken from '../../middlewares/accessControl/accessControl';
+import { adminOnly } from '../../middlewares/accessControl/protectedRouteAdmin';
 import { getXataClient } from '../../xata';
+
 
 export const createTask = express.Router();
 const xata = getXataClient();
 
+dotenv.config();
+
+
 // Create Task
 // Create Task
-createTask.post("/", async (req: Request, res: Response): Promise<void> => {
+createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { description, status, dueDate } = req.body;
 
     // Validate required fields
@@ -16,8 +23,8 @@ createTask.post("/", async (req: Request, res: Response): Promise<void> => {
     }
 
     // Default values
-    const projectId = 'id-71985267';  // Replace with your actual default projectId
-    const assignedTo = 'id-66787921';  // Replace with your actual default assignedTo
+    const projectId = process.env.projectId;  // Replace with your actual default projectId
+    const assignedTo = process.env.assignedTo;  // Replace with your actual default assignedTo
 
     try {
         // Ensure the dueDate is in proper format and insert the task
@@ -78,13 +85,13 @@ createTask.get("/:taskId", async (req: Request, res: Response): Promise<void> =>
 });
 
 // Update Task by ID
-createTask.put("/:taskId", async (req: Request, res: Response): Promise<void> => {
+createTask.put("/:taskId", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { taskId } = req.params;
     const { description, status, dueDate } = req.body;
 
     // Default values for `projectId` and `assignedToId`
-    const defaultProjectId = 'id-71985267';  // Default project ID
-    const defaultAssignedToId = 'id-66787921';  // Default assigned user ID
+    const defaultProjectId = process.env.projectId;  // Default project ID
+    const defaultAssignedToId = process.env.assignedTo;  // Default assigned user ID
 
     try {
         const result: any = await xata.sql`
@@ -108,7 +115,7 @@ createTask.put("/:taskId", async (req: Request, res: Response): Promise<void> =>
 
 
 // Delete Task by ID
-createTask.delete("/:taskId", async (req: Request, res: Response): Promise<void> => {
+createTask.delete("/:taskId", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { taskId } = req.params;
     try {
         const result: any = await xata.sql`

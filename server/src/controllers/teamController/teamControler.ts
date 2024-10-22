@@ -1,29 +1,21 @@
+import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
+import authenticateToken from '../../middlewares/accessControl/accessControl';
+import { adminOnly } from '../../middlewares/accessControl/protectedRouteAdmin';
 import { getXataClient } from '../../xata';
 
 export const teamRouter = express.Router();
 const xata = getXataClient();
+dotenv.config();
 interface customReq extends Request {
     user?: any
 }
 
 // Schema validation for creating/updating a team
-const validateTeamSchema = {
-    name: {
-        in: ['body'],
-        isString: true,
-        errorMessage: "Name is required and should be a string"
-    },
-    description: {
-        in: ['body'],
-        isString: true,
-        errorMessage: "Description is required and should be a string"
-    }
-};
 
 // Create a Team
-teamRouter.post("/", async (req: customReq, res: Response): Promise<void> => {
+teamRouter.post("/", adminOnly, authenticateToken, async (req: customReq, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -32,7 +24,7 @@ teamRouter.post("/", async (req: customReq, res: Response): Promise<void> => {
     const { name, description } = req.body;
 
     // Set default adminId value
-    const adminId = "id-75405985";
+    const adminId = process.env.adminId;
 
     try {
         // Insert new team into Xata database with default adminId
@@ -87,7 +79,7 @@ teamRouter.get("/:teamId", async (req: Request, res: Response): Promise<void> =>
 });
 
 // Update Team by ID
-teamRouter.put("/:teamId", async (req: Request, res: Response): Promise<void> => {
+teamRouter.put("/:teamId", adminOnly, async (req: Request, res: Response): Promise<void> => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         res.status(400).json({ errors: errors.array() });
@@ -117,7 +109,7 @@ teamRouter.put("/:teamId", async (req: Request, res: Response): Promise<void> =>
 });
 
 // Delete Team by ID
-teamRouter.delete("/:teamId", async (req: Request, res: Response): Promise<void> => {
+teamRouter.delete("/:teamId", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
     const { teamId } = req.params;
 
     try {
