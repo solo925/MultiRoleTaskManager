@@ -20,11 +20,13 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
     // Check if all required fields are present
     if (!name || !email || !password || !confirmPassword) {
         res.status(400).json({ message: 'All fields are required!' });
+        return;
     }
 
     // Validate password and confirmPassword match
     if (password !== confirmPassword) {
         res.status(400).json({ message: 'Passwords do not match!' });
+        return;
     }
 
     try {
@@ -32,6 +34,7 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
         const existingUser = await xata.db.users.filter({ email }).getFirst();
         if (existingUser) {
             res.status(400).json({ message: 'User already exists' });
+            return;
         }
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -62,6 +65,7 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
 
             // Respond with the token and user information
             res.status(201).json({ token, message: 'User registered successfully', user: newUser });
+            return;
         } else {
             // If no records were returned, log and return error
             console.log("User creation failed: No result returned");
@@ -71,6 +75,7 @@ RegisterController.post('/', async (req: Request, res: Response): Promise<void> 
         // Catch SQL or any unexpected errors
         console.error("Error during user creation: ", error);
         res.status(500).json({ message: 'Server error', error: error.message });
+        return;
     }
 });
 
@@ -99,9 +104,9 @@ loginController.post('/', async (req: Request, res: Response): Promise<any> => {
             expiresIn: '1h',
         });
 
-        res.status(200).json({ token, message: 'Login successful', user });
+        return res.status(200).json({ token, message: 'Login successful', user });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        return res.status(500).json({ message: 'Server error', error });
     }
 });
 

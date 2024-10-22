@@ -1,121 +1,149 @@
 import CreateTeam from "../components/CreateTeam";
-import Button from "../components/Button";
-import { useState, ChangeEvent, FormEvent } from "react";
+import toast, { Toaster } from "react-hot-toast";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 interface TeamFormData {
-  teamID: string;
   team_name: string;
   teamDescription: string;
-  adminID: string;
 }
+
+interface Team {
+  adminId: string;
+  description: string;
+  name: string;
+  xata_createdat: string;
+  xata_id: string;
+}
+
 const TeamManagement = () => {
-    const [showTeamForm, setShowTeamForm] = useState<boolean>(false);
-    const [displayComponents, setDisplayComponents] = useState([]);
-    const [formData,setFormData] = useState<TeamFormData>({
-      teamID:"",
-      team_name:"",
-      teamDescription:"",
-      adminID:""
+  const [showTeamForm, setShowTeamForm] = useState<boolean>(false);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [formData, setFormData] = useState<TeamFormData>({
+    team_name: "",
+    teamDescription: ""
+  });
+
+  const handleToggleForm = () => {
+    setShowTeamForm((prev) => !prev);
+  };
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const submitData = async (e: FormEvent) => {
+    e.preventDefault();
+    const response = await fetch("http://localhost:3000/api/v1/teams",{
+      method:'POST',
+      headers:{
+        "Content-Type":'application/json'
+      },
+      body: JSON.stringify({formData})
     })
 
-    const handleToggleForm = ()=>{
-      setShowTeamForm(prev => !prev);
+    if (!response.ok) {
+      toast.error("Error creating team")
+    }else{
+      toast.success("New team created successfully")
     }
+  };
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>)=>{
-      const {name,value} = e.target;
-      setFormData(prev => ({...prev,[name]:value}));
+  useEffect(() => {
+    async function fetchTeams() {
+      try {
+        const response = await fetch("http://localhost:3000/api/v1/teams");
+        if (!response.ok) {
+          throw new Error("Error fetching teams");
+        }
 
+        const data = await response.json();
+        console.log(data);
+        
+        if (data.length < 1) {
+          toast.error("No teams found");
+        } else {
+          setTeams(data); 
+        }
+      } catch (error) {
+        toast.error(error.message);
+      }
     }
-
-    const submitData = async (e: FormEvent)=>{
-      e.preventDefault()
-    }
-   
-
+    fetchTeams();
+  }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center gap-y-5 p-8 relative">
-      <h1 className="text-white">Manage your teams here</h1>
-      <div className="flex justify-start items-start">
-        <CreateTeam clickFunction={handleToggleForm} />
-       {
-        displayComponents.map((eachCard,index) => <div key={index}>{eachCard}</div>)
-       }
-
+    <div className="flex bg-slateGray flex-col justify-center items-center gap-y-5 p-8 relative">
+      <Toaster position="top-left"></Toaster>
+      <h1 className="text-black text-2xl mb-10 font-bold">Manage your teams here</h1>
+      <div className="flex flex-wrap justify-evenly gap-10">
+        <CreateTeam clickFunction={handleToggleForm}></CreateTeam>
+        {teams.map((eachTeam) => (
+          <div
+            key={eachTeam.xata_id}
+            className="p-5 flex flex-col gap-y-4 bg-slateGray text-white w-80  rounded-md shadow-2xl"
+          >
+            <div className="text-xl text-black font-medium">
+              Team name: <br /> {eachTeam.name}
+            </div>
+            <div className="text-black font-light text-base">
+              Admin ID: {eachTeam.adminId}
+            </div>
+            <div className="text-black font-light text-base">
+              Team created at: <br /> {eachTeam.xata_createdat}
+            </div>
+          </div>
+        ))}
       </div>
-
-
-      {
-        showTeamForm && ( <div onSubmit={submitData} className="flex flex-col gap-5  w-[450px] absolute top-10 left-10 bg-white p-4 rounded-md shadow-lg">
-        <h1 className="text-center font-semibold">Create a new Team</h1>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
-          TeamID
-          </label>
-          <input
-            type="text"
-            id="teamID"
-            name="teamID"
-            value={formData.teamID}
-            readOnly
-            className="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            onChange={handleInputChange}
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
-          Team Name
-          </label>
-          <input
-            type="text"
-            id="teamName"
-            name="teamName"
-            value={formData.team_name}
-            onChange={handleInputChange}
-            placeholder="Name your team"
-            className="w-full p-2 border text-black border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
-          Team Description
-          </label>
-          <textarea
-          
-            id="teamDescription"
-            name="teamDescription"
-            value={formData.teamDescription}
-            onChange={handleInputChange}
-            className="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            aria-required
-          />
-        </div>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-black text-sm font-medium mb-2">
-          Admin ID
-          </label>
-          <input
-            type="text"
-            id="teamDescription"
-            name="teamDescription"
-            value={formData.adminID}
-            className="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-            readOnly
-            aria-readonly
-          />
-        </div>
-        <Button text="Create Team"></Button>
-      </div>)
-      }
-
      
+      {showTeamForm && (
+        <form
+          onSubmit={submitData}
+          className="flex flex-col gap-5 w-[450px] absolute top-10 right-10 bg-white p-4 rounded-md shadow-lg"
+        >
+          <h1 className="text-center font-semibold">Create a new Team</h1>
+          <div className="mb-4">
+            <label
+              htmlFor="team_name"
+              className="block text-black text-sm font-medium mb-2"
+            >
+              Team Name
+            </label>
+            <input
+              type="text"
+              id="team_name"
+              name="team_name"
+              value={formData.team_name}
+              onChange={handleInputChange}
+              placeholder="Name your team"
+              className="w-full p-2 border text-black border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="teamDescription"
+              className="block text-black text-sm font-medium mb-2"
+            >
+              Team Description
+            </label>
+            <textarea
+              id="teamDescription"
+              name="teamDescription"
+              value={formData.teamDescription}
+              onChange={handleInputChange}
+              className="w-full p-2 border text-black rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+              aria-required
+            />
+          </div>         
+          <button className="bg-blue text-white w-fit p-2 mx-auto">Create Team</button>
+        </form>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default TeamManagement
+export default TeamManagement;

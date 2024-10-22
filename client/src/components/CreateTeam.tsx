@@ -7,7 +7,7 @@ interface TeamProps {
 
 const CreateTeam:React.FC<TeamProps> = ({clickFunction}) => {
   return (
-    <div onClick={clickFunction} className="flex flex-col justify-center p-4 gap-y-4 items-center rounded-lg bg-green-500 text-white">
+    <div onClick={clickFunction} className="flex flex-col justify-center p-4 gap-y-4 w-80 items-center rounded-lg bg-blue text-white">
         <p className='text-lg font-medium'>Create a new Team</p>
         <IoPersonAdd className='text-3xl'></IoPersonAdd>
     </div>

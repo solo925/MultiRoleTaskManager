@@ -9,13 +9,16 @@ import ProjectManagement from "./pages/ProjectManagement"
 import TaskBoard from "./pages/TaskBoard"
 import TaskDetails from "./pages/TaskDetails"
 import Notifications from "./pages/Notifications"
+import Home from "./pages/Home"
+import Comments from "./pages/Comments"
 
 const App = () => {
   return (
     <div className="bg-back min-h-screen">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard></Dashboard>}></Route>
+          <Route path="/" element={<Home></Home>}></Route>
+          <Route path="/dashboard" element={<Dashboard></Dashboard>}></Route>
           <Route path="/user/login" element={<LoginUser></LoginUser>}></Route>
           <Route path="/user/register" element={<RegisterUser></RegisterUser>}></Route>
           <Route path="/admin/login" element={<LoginAdmin></LoginAdmin>}></Route>
@@ -26,6 +29,7 @@ const App = () => {
           <Route path="/tasks" element={<TaskBoard></TaskBoard>}></Route>
           <Route path="/tasks/view" element={<TaskDetails></TaskDetails>}></Route>
           <Route path="/notifications" element={<Notifications></Notifications>}></Route>
+          <Route path="/comments" element={<Comments></Comments>}></Route>
         </Routes>
       </BrowserRouter>
 

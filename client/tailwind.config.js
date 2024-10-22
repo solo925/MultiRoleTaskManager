@@ -8,6 +8,7 @@ export default {
         blue: '#5CB8E4',
         error: '#FF1E00',
         success: '#41B06E',
+        card: '#f9f9f9',
         slateGray: '#EEEEEE',
       },
     },

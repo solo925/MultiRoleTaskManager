@@ -4,19 +4,18 @@ import Navbar from "../components/Navbar"
 import { IoMdLogOut } from "react-icons/io";
 import { HiHome } from "react-icons/hi";
 import { RiPlayListAddFill } from "react-icons/ri";
-import { IoPeopleCircle } from "react-icons/io5";
 import { MdOutlineManageHistory } from "react-icons/md";
 import { AiOutlineTeam } from "react-icons/ai";
 import { FaCubesStacked } from "react-icons/fa6";
 import { MdNotificationsActive } from "react-icons/md";
 import { IoIosSearch } from "react-icons/io";
-import { PiCirclesThreePlusThin } from "react-icons/pi";
-import { IoPersonAdd } from "react-icons/io5";
+import { FaComments } from "react-icons/fa";
 
 
 const Dashboard = () => {
     const [logoutModal,setLogoutModal] = useState<boolean>(false);
-    const [inviteModal,setInviteModal] = useState<boolean>(false);
+
+    // const [userProjects,setUserProjects] = useState([]);
   return (
     <div className="flex flex-col px-8 relative">
         <Navbar></Navbar>
@@ -42,18 +41,11 @@ const Dashboard = () => {
                     <FaCubesStacked></FaCubesStacked>
                     <span>Manage Projects</span>
                 </Link>
-                <div className="hover:bg-white hover:text-black flex gap-x-3 text-white p-3 justify-start items-center shadow-sm text-lg rounded-sm cursor-pointer">
-                    <IoPeopleCircle />
-                    <span>Create Team</span>
-                </div>
-                <div className="hover:bg-white hover:text-black flex gap-x-3 text-white p-3 justify-start items-center shadow-sm text-lg rounded-sm cursor-pointer">
-                    <PiCirclesThreePlusThin />
-                    <span>Create Project</span>
-                </div>
-                <div onClick={()=>setInviteModal(prev=> !prev)} className="hover:bg-white hover:text-black flex gap-x-3 text-white p-3 justify-start items-center shadow-sm text-lg rounded-sm cursor-pointer">
-                    <IoPersonAdd />
-                    <span>Invite Member</span>
-                </div>
+                <Link to={"/comments"} className="hover:bg-white hover:text-black flex gap-x-3 text-white p-3 justify-start items-center shadow-sm text-lg rounded-sm cursor-pointer">
+                    <FaComments />
+                    <span>View Comments</span>
+                </Link>
+                
                 <Link to={"/notifications"} className="hover:bg-white hover:text-black flex gap-x-3 text-white p-3 justify-start items-center shadow-sm text-lg rounded-sm cursor-pointer">
                     <MdNotificationsActive />
                     <span>Notifications</span>
@@ -69,6 +61,7 @@ const Dashboard = () => {
                     <IoIosSearch className="text-2xl cursor-pointer"/>
                 </div>
                 <h1 className="text-center text-xl text-white">Projects</h1>
+
             </div>
             <div className="teams bg-slateGray bg-opacity-15 rounded-lg w-1/5 p-2 h-[85vh]">
                 <h1 className="text-center text-xl text-white">Teams</h1>
@@ -86,7 +79,7 @@ const Dashboard = () => {
         </div>)
         }
 
-        {
+        {/* {
             inviteModal && (
                 <div className="absolute top-60 left-60 rounded-lg shadow-lg bg-white text-black p-5 w-80 flex justify-center items-center flex-col gap-y-5">
                     <h1 className="text-xl font-medium">Invite user</h1>
@@ -99,7 +92,27 @@ const Dashboard = () => {
 
                 </div>
             )
-        }
+        } */}
+
+
+        {/* {
+            createProjectModal && (
+                <div className="absolute top-60 left-60 rounded-lg shadow-lg bg-white text-black p-5 w-80 flex justify-center items-center flex-col gap-y-5">
+                    <h1 className="text-xl font-medium">Create a New Team</h1>
+                    <div className="flex flex-col gap-y-3 w-full">
+                        <label htmlFor="Name">Team name</label>
+                        <input type="text" placeholder="Input team name" className="p-2 px-3 outline outline-1 outline-success"/>
+                    </div>
+                    <div className="flex flex-col gap-y-3 w-full">
+                        <label htmlFor="Name">Team Description</label>
+                        <textarea placeholder="Input team description" className="p-2 px-3 outline outline-1 outline-success"/>
+                    </div>
+
+                    <button className="bg-success text-white px-4 outline p-2 rounded-md outline-1">Invite user</button>
+
+                </div>
+            )
+        } */}
 
         
     </div>

@@ -1,20 +1,40 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-import Button from "../../components/Button";
-import { Link } from "react-router-dom";
+import toast, {Toaster} from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginAdmin = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    console.log("Login attempt:", { email, password });
+
+    if(!email || !password){
+      toast.error("All fildes are ")
+    }
+    const response = await fetch("http://localhost:3000/api/v1/auth/login",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({email,password})
+    })
+    const data = await response.json();
+    if(!response.ok){
+      toast.error("Admin login failed")
+      toast.error(data.message)
+    }else{
+      toast.success("Admin logged in successfully")
+      navigate("/dashboard")
+    }
   };
 
   
 
   return (
     <div className="flex justify-center items-center h-screen">
+    <Toaster position="top-left"></Toaster>
     <form 
       onSubmit={handleSubmit}
       className="max-w-md w-[450px] flex flex-col gap-y-6 mx-auto mt-8 p-6 rounded-sm shadow-md"
@@ -60,7 +80,7 @@ const LoginAdmin = () => {
         <p className="text-white">New Here?</p>
         <Link to="/admin/register" className="text-blue">Create an account</Link>
       </div>
-      <Button text="Login"></Button>
+      <button onClick={handleSubmit} className="bg-blue text-white px-6 p-2">Log in Admin</button>
     </form>
     </div>
   );
