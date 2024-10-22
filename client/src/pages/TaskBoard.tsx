@@ -12,10 +12,29 @@ interface Task {
   xata_updatedat: string
 }
 
+interface CommentData {
+  comment: string
+  taskId: string
+}
+
+interface UpdateTaskData {
+  Project?: string
+  assignedTold?: string
+  description?: string
+  dueDate?: string
+  status?: boolean
+}
+
 const TaskBoard = () => {
   const [tasks, setTasks] = useState<Task[]>([])
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [commentInputs, setCommentInputs] = useState<{ [key: string]: string }>({})
+  const [editingTask, setEditingTask] = useState<string | null>(null)
+  const [updatedTaskData, setUpdatedTaskData] = useState<UpdateTaskData>({})
+  const [isDeleting, setIsDeleting] = useState<string | null>(null)
+  const [isUpdating, setIsUpdating] = useState<string | null>(null)
+  const [comment,setComment] = useState<string>('')
   
   // Filter states
   const [selectedStatus, setSelectedStatus] = useState<string>("")
@@ -55,7 +74,6 @@ const TaskBoard = () => {
     }
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const applyFilters = () => {
     let filtered = [...tasks]
 
@@ -106,6 +124,132 @@ const TaskBoard = () => {
   if (isLoading) {
     return <div className="text-white text-center p-8">Loading tasks...</div>
   }
+
+  const addComment = async (id: string)=>{
+    const response = await fetch("http://localhost:3000/api/v1/comments",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({comments})
+    })
+
+  }
+
+  const toggleTaskStatus = async (taskId: string, currentStatus: boolean) => {
+    try {
+      setIsUpdating(taskId)
+      const response = await fetch(`http://localhost:3000/api/v1/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          status: !currentStatus
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update task status")
+      }
+
+      await fetchTasks() // Refresh tasks
+      toast.success("Task status updated successfully")
+    } catch (error) {
+      toast.error("Failed to update task status")
+    } finally {
+      setIsUpdating(null)
+    }
+  }
+
+  const deleteTask = async (taskId: string) => {
+    if (!window.confirm("Are you sure you want to delete this task?")) {
+      return
+    }
+
+    try {
+      setIsDeleting(taskId)
+      const response = await fetch(`http://localhost:3000/api/v1/tasks/${taskId}`, {
+        method: "DELETE"
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task")
+      }
+
+      await fetchTasks() // Refresh tasks
+      toast.success("Task deleted successfully")
+    } catch (error) {
+      toast.error("Failed to delete task")
+    } finally {
+      setIsDeleting(null)
+    }
+  }
+
+  const startEditing = (task: Task) => {
+    setEditingTask(task.xata_id)
+    setUpdatedTaskData({
+      Project: task.Project,
+      assignedTold: task.assignedTold,
+      description: task.description,
+      dueDate: task.dueDate
+    })
+  }
+
+  const cancelEditing = () => {
+    setEditingTask(null)
+    setUpdatedTaskData({})
+  }
+
+  const updateTask = async (taskId: string) => {
+    try {
+      setIsUpdating(taskId)
+      const response = await fetch(`http://localhost:3000/api/v1/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedTaskData)
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update task")
+      }
+
+      await fetchTasks() // Refresh tasks
+      toast.success("Task updated successfully")
+      setEditingTask(null)
+      setUpdatedTaskData({})
+    } catch (error) {
+      toast.error("Failed to update task")
+    } finally {
+      setIsUpdating(null)
+    }
+  }
+
+  const handleInputChange = (field: keyof UpdateTaskData, value: string | boolean) => {
+    setUpdatedTaskData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const changeTaskStatus = async (taskId: string)=>{
+    const response = await fetch(`http://localhost:3000/api/v1/tasks/${taskId}`)
+    if (!response.ok) {
+      toast.error("Task not found")
+    }else{
+      const targetTask =  await response.json();
+      const taskStatus = targetTask.status;
+      if (taskStatus === true) {
+        targetTask.status = "In progress"
+      }else{
+        targetTask.status = "Completed"
+      }
+      toast.success("Task updated successfully")
+    }
+  }
+
 
   return (
     <div className="grid grid-cols-5 gap-x-5 justify-between items-start p-8 text-white">
@@ -247,8 +391,8 @@ const TaskBoard = () => {
                 key={task.xata_id} 
                 className="bg-card flex flex-col gap-y-2 px-6 text-black p-3 rounded-md shadow-md hover:shadow-lg transition-shadow"
               >
-                <div className="text-xl font-medium">Project ID: {task.Project}</div>
-                <div className="text-base font-light">Task ID: {task.xata_id}</div>
+                <div className="text-xl font-medium">Task ID: {task.xata_id}</div>
+                <div className="text-base font-light">Project ID: {task.Project}</div>
                 <div className="text-base font-light">Description: {task.description}</div>
                 <div className="text-base font-light">Assigned To: {task.assignedTold}</div>
                 <div className="text-base font-light">
@@ -258,11 +402,21 @@ const TaskBoard = () => {
                   Due: {new Date(task.dueDate).toLocaleDateString()}
                 </div>
 
+                <div className="mt-4">
+                      <textarea
+                        value={commentInputs[task.xata_id] || ""}
+                        onChange={(e) => handleCommentChange(task.xata_id, e.target.value)}
+                        placeholder="Add a comment..."
+                        className="w-full p-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        rows={2}
+                      />
+                    </div>
+
                 <div className="flex gap-x-2">
-                  <button className="px-4 p-2 text-sm text-white bg-success">Add comment</button>
-                  <button className="px-4 p-2 text-sm text-white bg-black">Change status</button>
-                  <button className="px-4 p-2 text-sm text-white bg-error">Delete task</button>
-                  <button className="px-4 p-2 text-sm text-white bg-blue">Update task</button>
+                  <button onClick={()=>addComment(task.xata_id)} className="px-4 p-2 text-sm text-white bg-success">Add comment</button>
+                  <button onClick={()=>changeTaskStatus(task.xata_id)} className="px-4 p-2 text-sm text-white bg-black">Change status</button>
+                  <button onClick={()=>deleteTask(task.xata_id)} className="px-4 p-2 text-sm text-white bg-error">Delete task</button>
+                  <button onClick={()=>updateTask(task.xata_id)} className="px-4 p-2 text-sm text-white bg-blue">Update task</button>
                 </div>
               </div>
             ))

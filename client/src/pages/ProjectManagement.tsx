@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import toast, { Toaster } from 'react-hot-toast';
-import Button from "../components/Button";
 import CreateProject from "../components/CreateProject";
 
 interface ProjectFormData {
@@ -21,6 +20,7 @@ const ProjectManagement = () => {
   const [showProjectForm, setShowProjectForm] = useState(false);
   const [editProject, setEditProject] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
+
 
   const [formData, setFormData] = useState<ProjectFormData>({
     id: "",
@@ -42,7 +42,15 @@ const ProjectManagement = () => {
   useEffect(() => {
     async function fetchProjects() {
       try {
-        const response = await fetch("http://localhost:3000/api/v1/projects");
+        const response = await fetch("http://localhost:3000/api/v1/projects",
+          {
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify({formData})
+          }
+        );
         if (!response.ok) {
           throw new Error("Error fetching projects");
         }
@@ -59,6 +67,17 @@ const ProjectManagement = () => {
     }
     fetchProjects();
   }, []);
+
+  const createTeam = async ()=>{
+    const response = await fetch ("http://localhost:3000/api/v1/projects")
+    const data = await response.json();
+    if (!response.ok) {
+      toast.error("Error creating team")
+      toast.error(data.message)
+    }else{
+      toast.success("Project created successfully")
+    }
+  }
 
   return (
     <div className="p-8 flex flex-col gap-y-10">
@@ -119,7 +138,7 @@ const ProjectManagement = () => {
               readOnly
             />
           </div>
-          <Button text="Create Project" />
+          <button onClick={createTeam} className="text-white bg-blue text-sm p-2 px-6">Create Project</button>
         </form>
       )}
     </div>

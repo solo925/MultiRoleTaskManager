@@ -8,6 +8,7 @@ const RegisterAdmin: React.FC<RegisterFormProps> = () => {
   const [name, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [role] = useState<string>("Admin");
   const navigate = useNavigate();
 
@@ -20,17 +21,17 @@ const RegisterAdmin: React.FC<RegisterFormProps> = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, confirmPassword, role }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.message || "Error creating Team member");
+        toast.error(data.message || "Error creating Admin");
         return;
       }
 
-      toast.success("User created successfully");
+      toast.success("Admin created successfully");
 
       // Navigate user to login page
       navigate("/admin/login");
@@ -41,7 +42,7 @@ const RegisterAdmin: React.FC<RegisterFormProps> = () => {
   };
 
   return (
-    <div className="h-screen flex justify-center items-center">
+    <div className="min-h-screen flex justify-center items-center">
       <Toaster position="top-left" />
       <form
         onSubmit={handleSubmit}
@@ -100,6 +101,24 @@ const RegisterAdmin: React.FC<RegisterFormProps> = () => {
             name="password"
             value={password}
             onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label
+            htmlFor="password"
+            className="block text-white text-sm font-medium mb-2"
+          >
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={confirmPassword}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
