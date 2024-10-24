@@ -42,6 +42,7 @@ const RegisterUser = () => {
       }
 
       toast.success("User created successfully");
+      localStorage.setItem("USERACCESSTOKEN_tasktracker", data.token);
 
       // Navigate user to login page
       setTimeout(() => {

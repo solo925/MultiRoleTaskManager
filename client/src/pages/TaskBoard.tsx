@@ -251,6 +251,11 @@ const TaskBoard = () => {
   }
 
 
+  function handleCommentChange(xata_id: string, value: string): void {
+    
+    throw new Error("Function not implemented.")
+  }
+
   return (
     <div className="grid grid-cols-5 gap-x-5 justify-between items-start p-8 text-white">
       <Toaster position="top-left" />
