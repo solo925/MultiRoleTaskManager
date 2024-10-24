@@ -8,7 +8,7 @@ const xata = getXataClient();
 
 // Ensure correct import for CustomRequest1
 
-createProject.post("/", adminOnly, authenticateToken, async (req: CustomRequest1, res: Response): Promise<any> => {
+createProject.post("/", authenticateToken, async (req: CustomRequest1, res: Response): Promise<any> => {
     const { name } = req.body;
 
     // Validate that the name is provided

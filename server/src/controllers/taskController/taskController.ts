@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import authenticateToken from '../../middlewares/accessControl/accessControl';
 import { adminOnly } from '../../middlewares/accessControl/protectedRouteAdmin';
 import { getXataClient } from '../../xata';
@@ -24,9 +25,25 @@ createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Res
 
     // Default values
     const projectId = process.env.projectId;  // Replace with your actual default projectId
-    const assignedTo = process.env.assignedTo;  // Replace with your actual default assignedTo
 
     try {
+        // Extract JWT token from headers
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            res.status(401).json({ error: 'Authorization header is missing' });
+            return;
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            res.status(401).json({ error: 'Token is missing' });
+            return;
+        }
+
+        // Decode the token to get the user ID
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+        const assignedTo = decoded.id; // This should be the xata_id of the logged-in user
+
         // Ensure the dueDate is in proper format and insert the task
         const result: any = await xata.sql`
             INSERT INTO "task" (
