@@ -15,16 +15,13 @@ dotenv.config();
 // Create Task
 // Create Task
 createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
-    const { description, status, dueDate } = req.body;
+    const { description, status, dueDate, projectName } = req.body;
 
     // Validate required fields
-    if (!description || status === undefined || !dueDate) {
+    if (!description || status === undefined || !dueDate || !projectName) {
         res.status(400).json({ error: "All fields are required!" });
         return;
     }
-
-    // Default values
-    const projectId = process.env.projectId;  // Replace with your actual default projectId
 
     try {
         // Extract JWT token from headers
@@ -44,11 +41,23 @@ createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Res
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
         const assignedTo = decoded.id; // This should be the xata_id of the logged-in user
 
-        // Ensure the dueDate is in proper format and insert the task
+        // Get the project ID based on the project name
+        const projectResult: any = await xata.sql`
+            SELECT xata_id 
+            FROM "project" 
+            WHERE "name" = ${projectName};`;
+
+        if (!projectResult.records || projectResult.records.length === 0) {
+            res.status(404).json({ error: "Project not found." });
+        }
+
+        const projectId = projectResult.records[0].xata_id || process.env.projectId; // Use the xata_id of the found project
+
+        // Insert the task into the database
         const result: any = await xata.sql`
             INSERT INTO "task" (
                 "Project", 
-                "assignedTold", 
+                "assignedToId", 
                 "description", 
                 "dueDate", 
                 "status"
@@ -71,6 +80,7 @@ createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Res
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 
