@@ -15,3 +15,50 @@
 .calligraphy {
   font-family: Calligraffitti;
 }
+
+.custom-scroll-container {
+  position: relative;
+  height: 85vh;
+  background: var(--card-background);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  width: 16.666667%;
+}
+
+.scroll-content {
+  height: 80%;
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.scroll-content::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Opera */
+}
+
+.scroll-button {
+  position: absolute;
+  left: 80%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(0, 0, 0);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.scroll-button:hover {
+  background-color: black;
+  color: white;
+}
+
+.scroll-button-up {
+  top: 5rem;
+}
+
+.scroll-button-down {
+  bottom: 1rem;
+}
