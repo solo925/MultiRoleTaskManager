@@ -16,43 +16,41 @@ createProject.post("/", adminOnly, authenticateToken, async (req: CustomRequest1
         return res.status(400).json({ error: "Name is required!" });
     }
 
-    // Auto-generate the teamId
-    const teamId = "id-00285243";  // Unique teamId generated on each request
-
-    // Use the authenticated user's xata_id (if logged in) or fall back to a default adminId
+    // Use the authenticated user's xata_id to find their team
     const userId = req.user?.xata_id;
-    // Use the token's xata_id if available
 
     try {
+        // Get the user's teamId based on their userId
+        const userTeamResult: any = await xata.sql`
+            SELECT teamId 
+            FROM "users" 
+            WHERE xata_id = ${userId};`;
+
+        if (!userTeamResult.records || userTeamResult.records.length === 0) {
+            return res.status(404).json({ error: "User does not belong to any team." });
+        }
+
+        const teamId = userTeamResult.records[0].teamId || process.env.teamId; // Get the user's teamId
+
         // Check if a project with the same name already exists
         const existingProjectResult: any = await xata.sql`
-            SELECT * FROM "project" WHERE "NAME" = ${name};`;
+            SELECT * FROM "project" WHERE "NAME" = ${name} AND "teamId" = ${teamId};`;
 
         if (existingProjectResult.records && existingProjectResult.records.length > 0) {
             return res.status(409).json({ error: "A project with this name already exists." });
         }
 
-        // Insert new project into the Xata database with the generated teamId and userId
+        // Insert new project into the Xata database with the retrieved teamId
         const insertResult: any = await xata.sql`
             INSERT INTO "project" ("NAME", "teamId")
             VALUES (${name}, ${teamId})
-            RETURNING *;
-        `;
+            RETURNING *;`;
 
-        // Retrieve the newly inserted project
-        const newProject: any = await xata.sql`
-            SELECT * FROM "project" WHERE "NAME" = ${name} AND "teamId" = ${teamId} ORDER BY "xata_createdat" DESC LIMIT 1;
-        `;
-
-        // If the project was successfully created, return the result
-        if (newProject.records && newProject.records.length > 0) {
-            return res.status(201).json({
-                message: "Project created successfully!",
-                data: newProject.records[0],  // Return the inserted project
-            });
-        } else {
-            return res.status(500).json({ error: "Failed to retrieve created project." });
-        }
+        // Return the newly inserted project
+        return res.status(201).json({
+            message: "Project created successfully!",
+            data: insertResult.records[0],  // Return the inserted project
+        });
     } catch (error: any) {
         console.error("Error creating project:", error);
         res.status(500).json({ error: error.message });

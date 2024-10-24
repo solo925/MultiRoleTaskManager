@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import authenticateToken from '../../middlewares/accessControl/accessControl';
 import { adminOnly } from '../../middlewares/accessControl/protectedRouteAdmin';
 import { getXataClient } from '../../xata';
@@ -14,24 +15,49 @@ dotenv.config();
 // Create Task
 // Create Task
 createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Response): Promise<void> => {
-    const { description, status, dueDate } = req.body;
+    const { description, status, dueDate, projectName } = req.body;
 
     // Validate required fields
-    if (!description || status === undefined || !dueDate) {
+    if (!description || status === undefined || !dueDate || !projectName) {
         res.status(400).json({ error: "All fields are required!" });
         return;
     }
 
-    // Default values
-    const projectId = process.env.projectId;  // Replace with your actual default projectId
-    const assignedTo = process.env.assignedTo;  // Replace with your actual default assignedTo
-
     try {
-        // Ensure the dueDate is in proper format and insert the task
+        // Extract JWT token from headers
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            res.status(401).json({ error: 'Authorization header is missing' });
+            return;
+        }
+
+        const token = authHeader.split(' ')[1];
+        if (!token) {
+            res.status(401).json({ error: 'Token is missing' });
+            return;
+        }
+
+        // Decode the token to get the user ID
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+        const assignedTo = decoded.id; // This should be the xata_id of the logged-in user
+
+        // Get the project ID based on the project name
+        const projectResult: any = await xata.sql`
+            SELECT xata_id 
+            FROM "project" 
+            WHERE "name" = ${projectName};`;
+
+        if (!projectResult.records || projectResult.records.length === 0) {
+            res.status(404).json({ error: "Project not found." });
+        }
+
+        const projectId = projectResult.records[0].xata_id || process.env.projectId; // Use the xata_id of the found project
+
+        // Insert the task into the database
         const result: any = await xata.sql`
             INSERT INTO "task" (
                 "Project", 
-                "assignedTold", 
+                "assignedToId", 
                 "description", 
                 "dueDate", 
                 "status"
@@ -54,6 +80,7 @@ createTask.post("/", adminOnly, authenticateToken, async (req: Request, res: Res
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 
