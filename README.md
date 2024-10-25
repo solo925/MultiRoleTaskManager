@@ -25,7 +25,7 @@ This repository contains the source code for **TEACH2GIVE Group 7**, a collabora
 ### Backend
 
 - **Node.js** and **Express.js** for creating server-side logic.
-- **Postgressql** for storing data in a NoSQL database.
+- **Postgressql** for storing data in a database.
 <!-- - **Mongoose** for managing database operations. -->
 - **JWT** (JSON Web Tokens) for user authentication and session management.
 
@@ -68,13 +68,6 @@ Once features are tested and complete, they are merged into the main branch via 
 ## Getting Started
 
 A quick guide on how to get things running
-
-### Prerequisites
-
-Before you begin, ensure you have the following tools installed on your local machine:
-
-1. Node.js (v14+)
-2. MongoDB for the database
 
 ### Installation
 
